@@ -9,10 +9,14 @@ public class ActiveMqSenderRouter extends RouteBuilder {
     public void configure() throws Exception {
         // timer
         // queue
-        from("timer:active-mq-timer?period=10000")
-                .transform().constant("My msg for Active MQ")
+//        from("timer:active-mq-timer?period=10000")
+//                .transform().constant("My msg for Active MQ")
+//                .log("${body}")
+//                .to("activemq:my-activemq-queue");
+
+
+        from("file:files/json")
                 .log("${body}")
                 .to("activemq:my-activemq-queue");
-
     }
 }
