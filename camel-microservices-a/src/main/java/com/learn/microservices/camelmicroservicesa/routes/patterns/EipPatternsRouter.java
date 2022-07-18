@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Map;
 
-@Component
+//@Component
 public class EipPatternsRouter extends RouteBuilder {
 
     @Autowired
@@ -25,6 +25,11 @@ public class EipPatternsRouter extends RouteBuilder {
 
     @Override
     public void configure() throws Exception {
+
+        getContext().setTracing(true);
+
+        errorHandler(deadLetterChannel("activemq:dead-letter-queue"));
+
         // Pipeline
 
         // Content Based Routing - choice()
@@ -64,7 +69,7 @@ public class EipPatternsRouter extends RouteBuilder {
         // Dynamic Routing
 
         // Step 1, Step 2, Step 3
-        from("timer:routingSlip?period=10000")
+        from("timer:routingSlip?period={{time-period}}")
                 .transform().constant("My msg is hardcoded")
                 .dynamicRouter(method(dynamicRouter));
 
@@ -72,18 +77,17 @@ public class EipPatternsRouter extends RouteBuilder {
         // Endpoint 2
         // Endpoint 3
 
-//        from("timer:routingSlip?period=10000")
-//                .transform().constant("My msg is hardcoded")
-//                .routingSlip(simple(routingSlip));
-//
-//        from("direct:endpoint1")
-//                .log("log:directendpoint1");
-//
-//        from("direct:endpoint2")
-//                .log("log:directendpoint2");
-//
-//        from("direct:endpoint3")
-//                .log("log:directendpoint3");
+
+
+        from("direct:endpoint1")
+                .wireTap("log:wire-tap")// add
+                .log("{{endpoint-for-logging}}");
+
+        from("direct:endpoint2")
+                .log("log:directendpoint2");
+
+        from("direct:endpoint3")
+                .log("log:directendpoint3");
     }
 }
 
