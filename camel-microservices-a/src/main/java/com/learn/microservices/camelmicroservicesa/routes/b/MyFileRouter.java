@@ -19,10 +19,12 @@ public class MyFileRouter extends RouteBuilder {
 
     @Override
     public void configure() throws Exception {
+        // Pipeline
         from("file:files/input")
+//                .pipeline()
                 .routeId("Files-Input-Route")
                 .transform().body(String.class)
-                .choice()
+                .choice() // Content Based Routing
                     .when(simple("${file:ext} == 'xml'"))
                         .log("XML FILE")
 //                    .when(simple("${body} contains 'USD'"))
